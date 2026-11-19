@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>工作区排期 · 任务看板</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="identity">
+        <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span
+        ><strong>工作区排期</strong>
+      </div>
+      <form id="workspace-form" class="workspace">
+        <label for="workspace-input">工作区</label
+        ><input
+          id="workspace-input"
+          name="workspace"
+          list="workspaces"
+          maxlength="1024"
+          required
+          value="default"
+          autocomplete="off"
+        /><datalist id="workspaces"></datalist
+        ><button class="quiet compact" type="submit">切换</button>
+      </form>
+    </header>
+    <main>
+      <div class="heading">
+        <div>
+          <h1 id="page-title">任务看板</h1>
+          <p id="summary" class="muted" aria-live="polite">正在读取任务…</p>
+        </div>
+        <button id="new-task" class="primary" type="button">
+          <b aria-hidden="true">＋</b> 新建任务
+        </button>
+      </div>
+      <div class="toolbar">
+        <nav class="tabs" aria-label="任务视图">
+          <button type="button" id="show-board" aria-pressed="true">
+            状态看板</button
+          ><button type="button" id="show-timeline" aria-pressed="false">
+            小时排期
+          </button>
+        </nav>
+        <div id="date-nav" class="date-nav" hidden>
+          <button id="previous-day" class="quiet" aria-label="前一天">‹</button
+          ><input id="day" aria-label="排期日期" type="date" /><button
+            id="next-day"
+            class="quiet"
+            aria-label="后一天"
+          >
+            ›</button
+          ><button id="today" class="quiet">今天</button>
+        </div>
+      </div>
+      <p class="notice" id="notice" role="status" hidden></p>
+      <section id="board" class="board" aria-label="按状态分列的看板"></section>
+      <section id="timeline" hidden aria-label="每日时间轴">
+        <div class="time-heading">
+          <h2>当日排期</h2>
+          <span id="timezone" class="muted"></span>
+        </div>
+        <p class="hint">
+          拖动任务条可调整开始时间，拖动右端可调整时长。点开任务也可以直接改时间。
+        </p>
+        <div
+          class="timeline-scroll"
+          id="timeline-scroll"
+          tabindex="0"
+          aria-label="横向滚动时间轴"
+        >
+          <div id="timegrid" class="timegrid"></div>
+        </div>
+        <div class="time-heading unscheduled-heading">
+          <h2>未排期</h2>
+          <span id="unscheduled-count" class="muted"></span>
+        </div>
+        <div id="unscheduled" class="unscheduled"></div>
+      </section>
+    </main>
+    <dialog id="task-dialog" aria-labelledby="dialog-title">
+      <form id="task-form">
+        <div class="dialog-head">
+          <h2 id="dialog-title">新建任务</h2>
+          <button type="button" class="quiet close" aria-label="关闭">×</button>
+        </div>
+        <label
+          >任务名称<input
+            name="title"
+            required
+            maxlength="240"
+            placeholder="例如，验证登录流程"
+            autocomplete="off"
+        /></label>
+        <label
+          >任务说明<textarea
+            name="description"
+            maxlength="20000"
+            rows="3"
+            placeholder="要完成什么，怎样算完成"
+          ></textarea>
+        </label>
+        <div class="pair">
+          <label
+            >执行方<select name="executor">
+              <option value="manual">手动</option>
+              <option value="deepseek">DeepSeek Harness</option>
+              <option value="codex">Codex</option>
+            </select></label
+          ><label>状态<select name="status"></select></label>
+        </div>
+        <div class="pair">
+          <label
+            >计划开始（本地时间）<input
+              name="planned_start"
+              type="datetime-local"
+              step="60" /></label
+          ><label
+            >预计时长（分钟）<input
+              name="duration_minutes"
+              required
+              type="number"
+              min="1"
+              max="525600"
+              step="1"
+              value="60"
+          /></label>
+        </div>
+        <div id="actual" class="actual" hidden></div>
+        <details id="history" hidden>
+          <summary>执行记录</summary>
+          <ul id="history-list"></ul>
+        </details>
+        <p id="dialog-error" class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button type="button" class="quiet close">取消</button
+          ><button type="submit" class="primary">保存任务</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="event-dialog" aria-labelledby="event-title">
+      <form id="event-form">
+        <div class="dialog-head">
+          <h2 id="event-title">记录执行</h2>
+          <button class="quiet close" type="button" aria-label="关闭">×</button>
+        </div>
+        <p id="event-description" class="hint"></p>
+        <label id="result-label"
+          >结果摘要<textarea
+            name="result"
+            rows="3"
+            placeholder="记录结果或失败原因（选填）"
+          ></textarea>
+        </label>
+        <p class="form-error" id="event-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="quiet close" type="button">取消</button
+          ><button class="primary" type="submit">确认记录</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
